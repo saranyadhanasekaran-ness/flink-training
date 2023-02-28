@@ -26,7 +26,7 @@ import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.training.exercises.common.datatypes.TaxiRide;
 import org.apache.flink.training.exercises.common.sources.TaxiRideGenerator;
-import org.apache.flink.training.exercises.common.utils.MissingSolutionException;
+import org.apache.flink.training.exercises.common.utils.GeoUtils;
 
 /**
  * The Ride Cleansing exercise from the Flink training.
@@ -70,7 +70,9 @@ public class RideCleansingExercise {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // set up the pipeline
-        env.addSource(source).filter(new NYCFilter()).addSink(sink);
+        env.addSource(source)
+                .filter(new NYCFilter())
+                .addSink(sink);
 
         // run the pipeline and return the result
         return env.execute("Taxi Ride Cleansing");
@@ -78,9 +80,12 @@ public class RideCleansingExercise {
 
     /** Keep only those rides and both start and end in NYC. */
     public static class NYCFilter implements FilterFunction<TaxiRide> {
+        private static final long serialVersionUID = -7942739316446044155L;
+
         @Override
-        public boolean filter(TaxiRide taxiRide) throws Exception {
-            throw new MissingSolutionException();
+        public boolean filter(TaxiRide taxiRide) {
+            return GeoUtils.isInNYC(taxiRide.startLon, taxiRide.startLat)
+                    && GeoUtils.isInNYC(taxiRide.endLon, taxiRide.endLat);
         }
     }
 }
