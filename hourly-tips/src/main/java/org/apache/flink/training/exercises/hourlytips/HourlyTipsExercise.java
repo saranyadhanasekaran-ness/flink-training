@@ -108,17 +108,27 @@ public class HourlyTipsExercise {
                                             -2885163032440052780L;
 
                                     @Override
-                                    public void process(Long aLong,
-                                            ProcessWindowFunction<TaxiFare, Tuple3<Long, Long, Float>, Long, TimeWindow>.Context context,
+                                    public void process(
+                                            Long aLong,
+                                            ProcessWindowFunction<
+                                                                    TaxiFare,
+                                                                    Tuple3<Long, Long, Float>,
+                                                                    Long,
+                                                                    TimeWindow>
+                                                            .Context
+                                                    context,
                                             Iterable<TaxiFare> elements,
                                             Collector<Tuple3<Long, Long, Float>> out) {
                                         TaxiFare taxiFare = elements.iterator().next();
                                         out.collect(
-                                                new Tuple3<>(context.window().getEnd(), taxiFare.driverId, taxiFare.tip));
+                                                new Tuple3<>(
+                                                        context.window().getEnd(),
+                                                        taxiFare.driverId,
+                                                        taxiFare.tip));
                                     }
                                 });
 
-        //find the driver with the highest tips in an hour
+        // find the driver with the highest tips in an hour
         maxStream.windowAll(TumblingEventTimeWindows.of(Time.hours(1))).maxBy(2).addSink(sink);
 
         // execute the pipeline and return the result
